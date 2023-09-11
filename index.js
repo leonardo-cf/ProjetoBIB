@@ -38,12 +38,12 @@ app.post('/upload', upload.single('planilha'), (req, res) => {
         })
         .catch(error => {
           console.error('Erro ao criar os arquivos CSV:', error);
-          res.status(500).send('Erro ao processar a planilha.');
+          res.status(500).send('001 - Erro ao processar a planilha.');
         });
     })
     .catch(error => {
       console.error('Erro ao extrair dados:', error);
-      res.status(500).send('Erro ao processar a planilha.');
+      res.status(500).send('002 - Erro ao processar a planilha.');
     });
 });
 

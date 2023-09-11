@@ -16,10 +16,10 @@ function extrairDados(planilhaBuffer) {
           outros: [], // Array para armazenar registros de outros tipos
         };
 
-        for (let i = 1; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) { 
           const email = data[i][0]; // Obtém o valor da coluna de email
-          const primeiroNome = iconv.decode(data[i][1], 'latin1'); // Obtém o valor da coluna de primeiro nome e faz a decodificação de caracteres especiais
-          const ultimoNome = iconv.decode(data[i][2], 'latin1'); // Obtém o valor da coluna de último nome e faz a decodificação de caracteres especiais
+          const primeiroNome = iconv.decode(data[i][1], 'ISO-8859-1'); // Obtém o valor da coluna de primeiro nome e faz a decodificação de caracteres especiais
+          const ultimoNome = iconv.decode(data[i][2], 'ISO-8859-1'); // Obtém o valor da coluna de último nome e faz a decodificação de caracteres especiais
           const funcao = data[i][3]; // Obtém o valor da coluna de função
           let cpf = data[i][4]; // Obtém o valor da coluna de CPF
           // Tratamento do CPF
@@ -29,10 +29,12 @@ function extrairDados(planilhaBuffer) {
               cpf = String(cpf);
             }
             cpf = cpf.replace(/[^\d]/g, '').padStart(11, '0'); // Remove caracteres não numéricos do CPF e preenche com zeros à esquerda até completar 11 dígitos
+            cpf = cpf.slice(0, 6); // Usa somente os 6 primeiros dígitos
           } else {
             cpf = '00000000000'; // Caso o CPF esteja vazio, atribui um valor padrão de 11 zeros
+            cpf = cpf.slice(0, 6); // Usa somente os 6 primeiros dígitos
           }
-
+          
           const registro = {
             Email: email,
             'Primeiro Nome': primeiroNome,
@@ -40,14 +42,14 @@ function extrairDados(planilhaBuffer) {
             CPF: cpf,
           };
 
-          if (funcao === 'docente') {
-            registros.docente.push(registro); // Adiciona o registro ao array de registros do tipo docente
-          } else if (funcao === 'discente') {
-            registros.discente.push(registro); // Adiciona o registro ao array de registros do tipo discente
-          } else {
-            registros.outros.push(registro); // Adiciona o registro ao array de registros de outros tipos
-          }
+        if (funcao.match(/^docente$/i)) {      // Aceitará o nome "docente" tanto em maiúsculo quanto minúsculo
+          registros.docente.push(registro); // Adiciona o registro ao array de registros do tipo docente
+        } else if (funcao.match(/^discente$/i)) { // Aceitará o nome "discente" tanto em maiúsculo quanto minúsculo
+          registros.discente.push(registro); // Adiciona o registro ao array de registros do tipo discente
+        } else {
+          registros.outros.push(registro); // Adiciona o registro ao array de registros de outros tipos
         }
+      }
 
         resolve(registros); // Retorna os registros extraídos da planilha
       })
@@ -60,11 +62,12 @@ function criarCSV(registros, tipo) {
 
   const csvWriter = createObjectCsvWriter({
     path: nomeArquivo, // Define o caminho do arquivo
+    //header: registros[tipo].map(registro => registro.nome),
     header: [
-      { id: 'Email', title: 'Email' },
-      { id: 'Primeiro Nome', title: 'Primeiro Nome' },
-      { id: 'Último Nome', title: 'Último Nome' },
-      { id: 'CPF', title: 'CPF' },
+      { id: 'Email'},
+      { id: 'Primeiro Nome'},
+      { id: 'Último Nome'},
+      { id: 'CPF'},
     ], // Define o cabeçalho do arquivo CSV
   });
 

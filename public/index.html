@@ -31,7 +31,8 @@
     }
 
     .upload-form {
-      max-width: 400px;
+      /*max-width: 400px;*/
+      width: 800px;
       margin: 0 auto;
       padding: 20px;
       border: 1px solid #ccc;
@@ -84,7 +85,7 @@
   <div class="upload-form">
     <form action="/upload" method="post" class="d-sm-flex flex-column" enctype="multipart/form-data" id="upload-form">
       <label for="planilha" class="form-label">Selecione uma planilha:</label>
-      <input type="file" name="planilha" class="form-control form-control-lg" id="planilha" accept=".xlsx" required>
+      <input type="file" name="planilha" class="form-control form-control-lg" id="planilha" accept=".xlsx, .csv" required>
       <input type="submit" value="Enviar" class="btn btn-success p-2 mt-3">
     </form>
   </div>
