@@ -1,6 +1,7 @@
 // Importa as bibliotecas necessárias
 const xlsx = require('xlsx-populate');
 const fs = require('fs');
+const removeAccents = require('remove-accents');
 
 // Função para extrair dados de uma planilha Excel
 async function extrairDados(planilhaBuffer) {
@@ -22,15 +23,28 @@ async function extrairDados(planilhaBuffer) {
     // Itera sobre os dados da planilha
     for (let i = 0; i < data.length; i++) {
       const email = data[i][0];
-      const primeiroNome = data[i][1]; // Não é mais necessário decodificar aqui
-      const ultimoNome = data[i][2]; // Não é mais necessário decodificar aqui
+      const primeiroNome = removeAccents(data[i][1]).toUpperCase();
+      const ultimoNome = removeAccents(data[i][2]).toUpperCase();
       const funcao = data[i][3];
       let cpf = data[i][4];
 
-      // Verifica se o CPF está presente e pega os 6 primeiros dígitos, adicionando zeros à frente, se necessário
+      // Verifica se o CPF está presente
       if (cpf) {
-        cpf = String(cpf).replace(/\D/g, '').slice(0, 6).padStart(6, '0');
+        // Remove todos os caracteres não numéricos do CPF
+        cpf = String(cpf).replace(/\D/g, '');
+
+        // Verifica o comprimento atual do CPF
+        const cpfLength = cpf.length;
+
+        // Se o CPF tem menos de 11 dígitos, adiciona zeros à frente até que tenha 11 dígitos
+        if (cpfLength < 11) {
+          cpf = '0'.repeat(11 - cpfLength) + cpf;
+        }
+
+        // Pega os 6 primeiros dígitos do CPF
+        cpf = cpf.slice(0, 6);
       } else {
+        // Se o CPF não estiver presente, define como '000000'
         cpf = '000000';
       }
 
